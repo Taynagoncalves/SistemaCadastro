@@ -1,42 +1,34 @@
 <?php
-require 'conexao.php';
+include "conexao.php";
 
-$data = json_decode(file_get_contents('php://input'), true);
+$id = $_POST['id'] ?? '';
+$nome = $_POST['nome'] ?? '';
+$telefone = $_POST['telefone'] ?? '';
+$endereco = $_POST['endereco'] ?? '';
+$cep = $_POST['cep'] ?? '';
+$numero = $_POST['numero'] ?? '';
+$bairro = $_POST['bairro'] ?? '';
+$sexo = $_POST['sexo'] ?? '';
+$batizado = $_POST['batizado'] ?? '';
+$musico = $_POST['musico'] ?? '';
+$instrumento = $_POST['instrumento'] ?? '';
+$atuacao = $_POST['atuacao'] ?? '';
+$organista = $_POST['organista'] ?? '';
+$cargo = $_POST['cargo'] ?? '';
 
+if (empty($id)) {
+    echo "ID inválido";
+    exit;
+}
 
-$sql = "UPDATE membros SET
-    nome = :nome,
-    telefone = :telefone,
-    endereco = :endereco,
-    cep = :cep,
-    numero = :numero,
-    bairro = :bairro,
-    sexo = :sexo,
-    batizado = :batizado,
-    musico = :musico,
-    instrumento_id = :instrumento_id,
-    atuacao_id = :atuacao_id,
-    organista = :organista,
-    cargo_id = :cargo_id
-WHERE id = :id";
+$sql = "UPDATE membros SET nome=?, telefone=?, endereco=?, cep=?, numero=?, bairro=?, sexo=?, batizado=?, musico=?, instrumento=?, atuacao=?, organista=?, cargo=? WHERE id=?";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    ':nome' => $data['nome'],
-    ':telefone' => $data['telefone'],
-    ':endereco' => $data['endereco'],
-    ':cep' => $data['cep'],
-    ':numero' => $data['numero'],
-    ':bairro' => $data['bairro'],
-    ':sexo' => $data['sexo'],
-    ':batizado' => $data['batizado'],
-    ':musico' => $data['musico'],
-    ':instrumento_id' => $data['instrumento_id'] ?: null,
-    ':atuacao_id' => $data['atuacao_id'] ?: null,
-    ':organista' => $data['organista'],
-    ':cargo_id' => $data['cargo_id'] ?: null,
-    ':id' => $data['id']
-]);
+$stmt = $conexao->prepare($sql);
+$stmt->bind_param("sssssssssssssi", $nome, $telefone, $endereco, $cep, $numero, $bairro, $sexo, $batizado, $musico, $instrumento, $atuacao, $organista, $cargo, $id);
 
-echo json_encode(['status' => 'ok']);
+if ($stmt->execute()) {
+    echo "ok";
+} else {
+    echo "Erro ao editar";
+}
 ?>

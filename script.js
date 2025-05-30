@@ -15,16 +15,20 @@ function cadastrarMembro(event) {
 
   const formData = new FormData(document.getElementById("formulario"));
 
-  fetch("inserir_membro.php", {
+  fetch("cadastrar.php", {
     method: "POST",
     body: formData
   })
     .then(res => res.text())
     .then(msg => {
-      alert("Membro cadastrado com sucesso!");
-      document.getElementById("formulario").reset();
-      exibirInstrumentos("Não");
-      mostrarSecao("lista");
+      if (msg.trim() === "ok") {
+        alert("Membro cadastrado com sucesso!");
+        document.getElementById("formulario").reset();
+        exibirInstrumentos("Não");
+        mostrarSecao("lista");
+      } else {
+        throw new Error(msg);
+      }
     })
     .catch(err => {
       console.error("Erro ao cadastrar:", err);
@@ -36,9 +40,11 @@ function listarMembros(filtro = "") {
   const container = document.getElementById("lista-membros");
   container.innerHTML = "Carregando...";
 
-fetch("backend/listar_membros.php")
-
-    .then(res => res.json())
+  fetch("listar.php")
+    .then(res => {
+      if (!res.ok) throw new Error("Erro na resposta do servidor");
+      return res.json();
+    })
     .then(membros => {
       container.innerHTML = "";
 
